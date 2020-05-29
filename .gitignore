@@ -1,0 +1,19 @@
+# assume case sensitive, which is acheived with
+# git config core.ignorecase false
+
+## Apple stuff
+.DS_Store
+
+## emacs backups
+auto/
+*~
+
+## old files
+old/
+
+## private files
+COPYING-GPLv3-statement.txt
+TODO.txt
+
+
+
