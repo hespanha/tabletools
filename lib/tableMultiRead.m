@@ -24,7 +24,7 @@ declareParameter(...
 
 declareParameter(...
     'VariableName','inputFormat',...
-    'AdmissibleValues',{'xml','tab','csv','mat'},...
+    'AdmissibleValues',{'xml','tab','csv','mat','xlsx'},...
     'Description', {
         'Format of the input files:'
         '  xml - xml file with each row encapsulated by a given tag (see rowTag),'
@@ -221,7 +221,7 @@ for thisFile=1:length(files)
     end
     
     switch (inputFormat)
-      case {'tab','csv','mat'}
+      case {'tab','csv','mat','xlsx'}
         
         t1=clock;
         switch (inputFormat)
@@ -243,6 +243,9 @@ for thisFile=1:length(files)
           case {'csv'}
             opts = detectImportOptions(thisFilename);
             opts.Encoding=encoding;
+            t=readtable(thisFilename,opts);
+          case {'xlsx'}
+            opts = detectImportOptions(thisFilename);
             t=readtable(thisFilename,opts);
         end            
 
