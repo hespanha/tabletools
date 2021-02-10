@@ -24,7 +24,7 @@ declareParameter(...
 
 declareParameter(...
     'VariableName','inputFormat',...
-    'AdmissibleValues',{'xml','tab','csv','mat'},...
+    'AdmissibleValues',{'xml','tab','csv','mat','xlsx'},...
     'Description', {
         'Format of the input files:'
         '  xml - xml file with each row encapsulated by a given tag (see rowTag),'
@@ -93,9 +93,18 @@ declareParameter(...
     'VariableName','numberVariables',...
     'DefaultValue',{},...
     'Description', {
-        'Array of strings with names of variables that should be converted'
-        'to numeric values.'
+        'Array of strings with names of variables (i.e., column headers) that'
+        ' should be converted to numeric values.'
                    });
+
+declareParameter(...
+    'VariableName','ignoreVariables',...
+    'DefaultValue',{},...
+    'Description', {
+        'Array of strings with names of variables (i.e., column headers) that'
+        'should be ignored.'
+                   });
+
 
 %% xml specific
 declareParameter(...
@@ -221,7 +230,7 @@ for thisFile=1:length(files)
     end
     
     switch (inputFormat)
-      case {'tab','csv','mat'}
+      case {'tab','csv','mat','xlsx'}
         
         t1=clock;
         switch (inputFormat)
@@ -244,7 +253,17 @@ for thisFile=1:length(files)
             opts = detectImportOptions(thisFilename);
             opts.Encoding=encoding;
             t=readtable(thisFilename,opts);
+          case {'xlsx'}
+            opts = detectImportOptions(thisFilename);
+            t=readtable(thisFilename,opts);
         end            
+        
+        for v=1:length(ignoreVariables)
+            if ismember(ignoreVariables{v},t.Properties.VariableNames)
+                fprintf('~%s,',ignoreVariables{v});
+                t.(ignoreVariables{v})=[];
+            end
+        end
 
         variableNames=t.Properties.VariableNames;
         while 1 % this loop should only repeat once
@@ -390,9 +409,9 @@ for thisFile=1:length(files)
         fprintf('done (%d rows, %d columns, %.3f sec)\n',size(tbl,1),size(tbl,2),etime(clock,t1));
       otherwise
         error('tableMultiRead: unkown inputFormat ''%s''\n',inputFormat);
-    end
+    end % switch
     rowNames(end+1:size(tbl,1),1)=strcat(cellstr(num2str((1:thisNrows)','%-d')),cellstr(repmat([':',shortName],thisNrows,1)));
-end
+end % for thisFile=1:length(files)
 clear t
 
 %% Construct table
